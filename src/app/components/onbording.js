@@ -6,7 +6,7 @@ import axios from "axios";
 import {z} from "zod";
 import { useForm } from "react-hook-form"; 
 import {zodResolver} from "@hookform/resolvers/zod";
-  const skills = ["JavaScript", "React", "Java", "Spring Boot", "AWS"];
+  const skills = ["WEB DEVELOPMENT", "UI/UX", "AI", "CLOUD", "DEVOPS","BACKEND"];
   const formSchema = z.object({
     fullName: z.string().trim().min(2,"Must be 2 to 80 characters").max(80,"Must be 2 to 80 characters").regex(/^[\p{L} '’-]+$/u, "Only letters, spaces, apostrophes (’ or '), and hyphens (-) are allowed."),
     email: z.string().trim().min(1,"Email is required").email("Invalid email address"),
