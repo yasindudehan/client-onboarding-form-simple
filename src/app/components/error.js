@@ -1,6 +1,5 @@
 
 
-"use client"; 
 import { useState, useEffect } from "react";
 
 export default function PopError({ message, duration = 3000, onClose }) {

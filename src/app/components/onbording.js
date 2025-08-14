@@ -2,6 +2,7 @@
 "use client"; 
 import { useState ,useRef, useEffect} from "react";
 import PopError from "./error";
+import PopSuccess from "./sucess";
 import axios from "axios";
 import {z} from "zod";
 import { useForm } from "react-hook-form"; 
@@ -36,6 +37,7 @@ export default function Onboarding() {
 const [selectedSkills, setSelectedSkills] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 const [popError, setPopError] = useState("");
+  const [popSuccess, setPopSuccess] = useState("");
   const dropdownRef = useRef(null);
 
 
@@ -76,9 +78,10 @@ const [popError, setPopError] = useState("");
   
 
   const onSubmit=async (data)=>{
-    console.log(data);
+      setPopError("");
+    setPopSuccess("");
       try {
-    // Replace with your external API endpoint
+  
     const response = await axios.post(process.env.NEXT_PUBLIC_ONBOARD_URL, data , {
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +89,7 @@ const [popError, setPopError] = useState("");
       });
 
     console.log("Response:", response.data);
-    alert("Form submitted successfully!");
+    setPopSuccess("Form submitted successfully!");
   } catch (error) {
      if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -123,6 +126,7 @@ const [popError, setPopError] = useState("");
         <div className="md:flex-[2] md:ml-6 flex flex-col justify-center">
           <h1 className="text-4xl font-bold mb-6">Employee Info</h1>
           {popError && <PopError message={popError} onClose={() => setPopError("")} />}
+            {popSuccess && <PopSuccess message={popSuccess} onClose={() => setPopSuccess("")} />}
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 
             <div>
