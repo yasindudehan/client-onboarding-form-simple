@@ -7,12 +7,12 @@ import axios from "axios";
 import {z} from "zod";
 import { useForm } from "react-hook-form"; 
 import {zodResolver} from "@hookform/resolvers/zod";
-  const skills = ["WEB DEVELOPMENT", "UI/UX", "AI", "CLOUD", "DEVOPS","BACKEND"];
+  const defaultSkills = ["WEB DEVELOPMENT", "UI/UX", "AI", "CLOUD", "DEVOPS","BACKEND"];
   const formSchema = z.object({
     fullName: z.string().trim().min(2,"Must be 2 to 80 characters").max(80,"Must be 2 to 80 characters").regex(/^[\p{L} '’-]+$/u, "Only letters, spaces, apostrophes (’ or '), and hyphens (-) are allowed."),
     email: z.string().trim().min(1,"Email is required").email("Invalid email address"),
     companyName: z.string().min(2,"Must be 2 to 100 characters").max(100,"Must be 2 to 100 characters"),
-    services: z.array(z.enum(skills)).min(1,"At least one skill is required"),
+    services: z.array(z.string()).min(1,"At least one skill is required"),
      budgetUsd:z.number().int().min(100,"Must be at least $100").max(1000000,"Must be at most $1,000,000").optional(),
      projectStartDate:z.string()
      .min(1,"Start date is required")
@@ -35,20 +35,34 @@ export default function Onboarding() {
    
 
 const [selectedSkills, setSelectedSkills] = useState([]);
+const [services, setServices] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 const [popError, setPopError] = useState("");
   const [popSuccess, setPopSuccess] = useState("");
   const dropdownRef = useRef(null);
 
 
-  const toggleSkill = (skill) => {
+  const toggleSkill = (services) => {
     setSelectedSkills(prev =>
-      prev.includes(skill)
-        ? prev.filter(s => s !== skill)
-        : [...prev, skill]
+      prev.includes(services)
+        ? prev.filter(s => s !== services)
+        : [...prev, services]
     );
   };
-  
+     useEffect(() => {
+      const fetchServices = async () => {
+        try {
+          const response = await axios.get(process.env.RETRIVE_SERVICES);
+          console.log("Response:", response.data);
+          const titles = response.data?.map(item => item.title) || [];
+          setServices(titles.length > 0 ? titles : defaultSkills);
+        } catch (error) {
+          console.error("Error fetching services:", error, process.env.RETRIVE_SERVICES);
+          setServices(defaultSkills);
+        }
+      };
+      fetchServices();
+     }, [])
     useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -65,7 +79,7 @@ const [popError, setPopError] = useState("");
     resolver: zodResolver(formSchema),
     mode: "onChange",
       defaultValues: {
-    skills: [], 
+    services: [], 
     acceptTerms: false
   }
   });
@@ -159,7 +173,7 @@ const [popError, setPopError] = useState("");
 {errors.services && <p className="text-red-600 text-sm">{errors.services.message}</p>}
               {dropdownOpen && (
                 <div className="absolute z-10 bg-white border rounded-md mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
-                  {skills.map(skill => (
+                  {services.map(skill => (
                     <label key={skill} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
                       <input
                         type="checkbox"
